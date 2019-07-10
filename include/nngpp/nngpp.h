@@ -7,5 +7,8 @@
 #include "pipe.h"
 #include "aio.h"
 #include "url.h"
-//#include "snapshot.h"
+#include "stat.h"
+#include "stream/dialer.h"
+#include "stream/listener.h"
+#include "stream/stream.h"
 #endif

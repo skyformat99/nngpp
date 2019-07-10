@@ -1,6 +1,8 @@
 # nngpp
 
-C++ wrapper around the [NNG](https://github.com/nanomsg/nng) API
+C++ wrapper around the [nanomsg NNG](https://github.com/nanomsg/nng) API
+
+What's nanomsg? In a nutshell it's a spiritual successor to ZeroMQ, and NNG is its latest incarnation.
 
 ## Features
 
@@ -18,6 +20,7 @@ C++ wrapper around the [NNG](https://github.com/nanomsg/nng) API
 #include <nngpp/nngpp.h>
 #include <nngpp/protocol/req0.h>
 #include <nngpp/protocol/rep0.h>
+#include <cstdio>
 
 int main() try {
 	// create a socket for the rep protocol
@@ -66,6 +69,17 @@ I have kept the original structure of the demos intact, just replacing the nng A
 This allows for easy comparison with the nng demos, but may mean they are non-idiomatic in places.
 See the [`demo`](demo) directory.
 
+
+## Dependencies
+
+Since nngpp is a wrapper around nng, you will need to link with libnng.
+
+* If you built nng without tls support:
+`-lnng -lpthread`
+* If you built nng with tls support:
+`-lnng -lmbedtls -lmbedx509 -lmbedcrypto -lpthread`
+
+
 ## Design
 
 The nng API consists of a number of conceptual objects, such as 'socket' and 'pipe'.
@@ -107,28 +121,32 @@ nng::mtx mtx2;                // default constructor gives null mutex
 
 ### Summary
 
-| Name               | nng handle          | nngpp view                | nngpp RAII           |
-|:-------------------|:--------------------|:--------------------------|:---------------------|
-| socket             | `nng_socket`        | `nng::socket_view`        | `nng::socket`        |
-| context            | `nng_ctx`           | `nng::ctx_view`           | `nng::ctx`           |
-| dialer             | `nng_dialer`        | `nng::dialer_view`        | `nng::dialer`        |
-| listener           | `nng_listener`      | `nng::listener_view`      | `nng::listener`      |
-| pipe               | `nng_pipe`          | `nng::pipe_view`          | `nng::pipe`          |
-| message            | `nng_msg*`          | `nng::msg_view`           | `nng::msg`           |
-| async i/o          | `nng_aio*`          | `nng::aio_view`           | `nng::aio`           |
-| url                | `nng_url*`          | `nng::url_view`           | `nng::url`           |
-| buffer             | `void*, size_t`     | `nng::view`               | `nng::buffer`        |
-| snapshot           | `nng_snapshot*`     | `nng::snapshot_view`      | `nng::snapshot`      |
-| thread             | `nng_thread*`       | `nng::thread_view`        | `nng::thread`        |
-| mutex              | `nng_mtx*`          | `nng::mtx_view`           | `nng::mtx`           |
-| condition variable | `nng_cv*`           | `nng::cv_view`            | `nng::cv`            |
-| tls config         | `nng_tls_config*`   | `nng::tls::config_view`   | `nng::tls::config`   |
-| http client        | `nng_http_client*`  | `nng::http::client_view`  | `nng::http::client`  |
-| http connection    | `nng_http_conn*`    | `nng::http::conn_view`    | `nng::http::conn`    |
-| http handler       | `nng_http_handler*` | `nng::http::handler_view` | `nng::http::handler` |
-| http request       | `nng_http_req*`     | `nng::http::req_view`     | `nng::http::req`     |
-| http response      | `nng_http_res*`     | `nng::http::res_view`     | `nng::http::res`     |
-| http server        | `nng_http_server*`  | `nng::http::server_view`  | `nng::http::server`  |
+| Name               | nng handle             | nngpp view                   | nngpp RAII              |
+|:-------------------|:-----------------------|:-----------------------------|:------------------------|
+| socket             | `nng_socket`           | `nng::socket_view`           | `nng::socket`           |
+| context            | `nng_ctx`              | `nng::ctx_view`              | `nng::ctx`              |
+| dialer             | `nng_dialer`           | `nng::dialer_view`           | `nng::dialer`           |
+| listener           | `nng_listener`         | `nng::listener_view`         | `nng::listener`         |
+| pipe               | `nng_pipe`             | `nng::pipe_view`             | `nng::pipe`             |
+| message            | `nng_msg*`             | `nng::msg_view`              | `nng::msg`              |
+| async i/o          | `nng_aio*`             | `nng::aio_view`              | `nng::aio`              |
+| url                | `nng_url*`             | `nng::url_view`              | `nng::url`              |
+| buffer             | `void*, size_t`        | `nng::view`                  | `nng::buffer`           |
+| stat               | `nng_stat*`            | `nng::stat_view`             | `nng::stat`             |
+| thread             | `nng_thread*`          | `nng::thread_view`           | `nng::thread`           |
+| mutex              | `nng_mtx*`             | `nng::mtx_view`              | `nng::mtx`              |
+| condition variable | `nng_cv*`              | `nng::cv_view`               | `nng::cv`               |
+| tls config         | `nng_tls_config*`      | `nng::tls::config_view`      | `nng::tls::config`      |
+| http client        | `nng_http_client*`     | `nng::http::client_view`     | `nng::http::client`     |
+| http connection    | `nng_http_conn*`       | `nng::http::conn_view`       | `nng::http::conn`       |
+| http handler       | `nng_http_handler*`    | `nng::http::handler_view`    | `nng::http::handler`    |
+| http request       | `nng_http_req*`        | `nng::http::req_view`        | `nng::http::req`        |
+| http response      | `nng_http_res*`        | `nng::http::res_view`        | `nng::http::res`        |
+| http server        | `nng_http_server*`     | `nng::http::server_view`     | `nng::http::server`     |
+| stream             | `nng_stream*`          | `nng::stream::stream_view`   | `nng::stream::stream`   |
+| stream dialer      | `nng_stream_dialer*`   | `nng::stream::dialer_view`   | `nng::stream::dialer`   |
+| stream listener    | `nng_stream_listener*` | `nng::stream::listener_view` | `nng::stream::listener` |
+
 
 ### Error handling
 
